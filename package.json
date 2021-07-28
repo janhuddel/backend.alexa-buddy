@@ -1,0 +1,39 @@
+{
+  "name": "backend.alexa-buddy",
+  "version": "1.0.0",
+  "description": "",
+  "author": {
+    "name": "Jan Rohwer",
+    "email": "jan.rohwer@gmail.com"
+  },
+  "homepage": "https://github.com/janhuddel/backend.alexa-buddy",
+  "license": "MIT",
+  "keywords": [
+    "Alexa"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janhuddel/backend.alexa-buddy"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "node ./index.js",
+    "devserver": "nodemon ./index.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "date-fns": "^2.22.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "mongoose": "^5.13.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.10",
+    "pino": "^6.12.0",
+    "pino-express": "^1.1.1",
+    "pino-pretty": "^5.1.2",
+    "query-string": "^7.0.1",
+    "socket.io": "^4.1.3"
+  }
+}
