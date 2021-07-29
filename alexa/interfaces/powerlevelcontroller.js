@@ -6,7 +6,7 @@ const { findDeviceById } = require("../../database");
 
 const NAMESPACE = "Alexa.PowerLevelController";
 
-const stateProperty = (value, timeOfSample) => {
+const stateProperty = (capability, value, timeOfSample) => {
   if (!timeOfSample) {
     timeOfSample = new Date().toISOString();
   }
