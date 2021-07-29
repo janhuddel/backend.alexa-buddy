@@ -40,13 +40,13 @@ const positionModes = {
   },
 };
 
-const stateProperty = (capability, value, timeOfSample) => {
+const stateProperty = (value, timeOfSample, capability) => {
   if (!timeOfSample) {
     timeOfSample = new Date().toISOString();
   }
 
   let rawValue;
-  if (capability.statemapping) {
+  if (capability?.statemapping) {
     for (const [k, v] of Object.entries(capability.statemapping)) {
       if (v === value) {
         rawValue = k;

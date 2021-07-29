@@ -62,9 +62,9 @@ const defaultHandler = {
         const state = await clientSocket.getState(capability.datapoint);
 
         return interface.MapState(
-          capability,
           state.val,
-          new Date(state.ts).toISOString()
+          new Date(state.ts).toISOString(),
+          capability
         );
       })
     );
