@@ -65,11 +65,8 @@ module.exports.getClientSocket = (userId) => {
   return {
     getState: async (datapoint) => await sendMessage("getState", datapoint),
 
-    setState: async (datapoint, value) => {
-      return await sendMessage("setState", {
-        datapoint: datapoint,
-        value: value,
-      });
+    setState: async (states) => {
+      return await sendMessage("setState", states);
     },
   };
 };

@@ -24,7 +24,9 @@ const setPowerState = async (directive, user, clientSocket, value) => {
   const device = await findDeviceById(directive.endpoint.endpointId);
   const capability = device.capabilities["PowerController"];
 
-  await clientSocket.setState(capability.datapoint, value);
+  await clientSocket.setState({
+    [capability.datapoint]: value,
+  });
 
   const responseHeader = createHeader(directive.header, "Alexa", "Response");
 

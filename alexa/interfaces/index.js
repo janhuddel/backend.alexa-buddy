@@ -4,6 +4,7 @@ const { findUserDevices, findDeviceById } = require("../../database");
 const capabilityMap = {
   PowerController: require("./powercontroller"),
   PowerLevelController: require("./powerlevelcontroller"),
+  ColorController: require("./colorcontroller"),
   ShutterController: require("./shuttercontroller"),
 };
 
@@ -60,12 +61,20 @@ const defaultHandler = {
         const interface = capabilityMap[key];
 
         const state = await clientSocket.getState(capability.datapoint);
-
-        return interface.MapState(
-          state.val,
-          new Date(state.ts).toISOString(),
-          capability
-        );
+        if (state.val) {
+          return interface.MapState(
+            state.val,
+            new Date(state.ts).toISOString(),
+            capability
+          );
+        } else {
+          const firstState = Object.values(state)[0];
+          return interface.MapState(
+            state,
+            new Date(firstState.ts).toISOString(),
+            capability
+          );
+        }
       })
     );
 
@@ -99,6 +108,8 @@ module.exports.mapInterface = (namespace) => {
       return capabilityMap["PowerController"];
     case "Alexa.PowerLevelController":
       return capabilityMap["PowerLevelController"];
+    case "Alexa.ColorController":
+      return capabilityMap["ColorController"];
     case "Alexa.ModeController":
       // FIXME: ich benötige eine Zusatzinformation im Device (cookie?), um zu erkennen, auf was der ModeController gemapped werden soll
       return capabilityMap["ShutterController"];

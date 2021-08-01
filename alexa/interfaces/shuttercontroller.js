@@ -139,6 +139,7 @@ module.exports.SetMode = async (directive, user, clientSocket) => {
   const device = await findDeviceById(directive.endpoint.endpointId);
   const capability = device.capabilities["ShutterController"];
 
+  /*
   if (capability.busy) {
     const busyVal = await clientSocket.getState(capability.busy.datapoint);
     // TODO: resolve busy.expression
@@ -146,6 +147,7 @@ module.exports.SetMode = async (directive, user, clientSocket) => {
       return deviceInOperation(directive);
     }
   }
+  */
 
   let value;
   if (capability.statemapping) {
@@ -154,7 +156,9 @@ module.exports.SetMode = async (directive, user, clientSocket) => {
     value = directive.payload.mode === "Position.Down" ? 0 : 100;
   }
 
-  await clientSocket.setState(capability.datapoint, value);
+  await clientSocket.setState({
+    [capability.datapoint]: value,
+  });
 
   const responseHeader = createHeader(directive.header, "Alexa", "Response");
 

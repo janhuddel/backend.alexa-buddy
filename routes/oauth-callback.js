@@ -10,42 +10,39 @@ const config = {
 };
 const url = `https://api.amazon.com/auth/o2/token`;
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   // State from Server
   const stateFromServer = req.query.state;
   if (stateFromServer !== req.session.stateValue) {
     console.log("State doesn't match. uh-oh.");
     console.log(
-      `Saw: ${stateFromServer}, but expected: &{req.session.stateValue}`
+      `Saw: ${stateFromServer}, but expected: ${req.session.stateValue}`
     );
     res.redirect(302, "/");
     return;
   }
 
-  //post request to /token endpoint
-  axios
-    .post(
-      url,
-      qs.stringify({
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
-        code: req.query.code,
-        grant_type: "authorization_code",
-        redirect_uri: process.env.REDIRECT_URI,
-      }),
-      config
-    )
-    .then((result) => {
-      //console.log(result);
+  // aquire token from token-endpoint
+  const response = await axios.post(
+    "https://api.amazon.com/auth/o2/token",
+    qs.stringify({
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      code: req.query.code,
+      grant_type: "authorization_code",
+      redirect_uri: process.env.REDIRECT_URI,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
-      // save token to session
-      req.session.token = result.data.access_token;
+  // save token to session
+  req.session.token = response.data.access_token;
 
-      //redirect to Vue app
-      res.redirect(`http://localhost:3000`);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+  // redirect to Vue app
+  res.redirect(`http://localhost:3000`);
 });
 module.exports = router;

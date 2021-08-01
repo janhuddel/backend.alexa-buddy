@@ -40,8 +40,9 @@ module.exports.SetPowerLevel = async (directive, user, clientSocket) => {
   const capability = device.capabilities["PowerLevelController"];
 
   const value = directive.payload.powerLevel;
-
-  const currentValue = await clientSocket.setState(capability.datapoint, value);
+  await clientSocket.setState({
+    [capability.datapoint]: value,
+  });
 
   const responseHeader = createHeader(directive.header, "Alexa", "Response");
 
@@ -54,7 +55,7 @@ module.exports.SetPowerLevel = async (directive, user, clientSocket) => {
       payload: {},
     },
     context: {
-      properties: [stateProperty(currentValue)],
+      properties: [stateProperty(value)],
     },
   };
 };
