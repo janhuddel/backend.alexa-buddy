@@ -18,9 +18,13 @@ db.once("open", () => {
 
 const userSchema = new mongoose.Schema({
   _id: String,
+  created: Date,
+  updated: Date,
   name: String,
   email: String,
   apikey: String,
+  accessToken: String,
+  refreshToken: String,
 });
 
 const deviceSchema = new mongoose.Schema({
@@ -44,6 +48,8 @@ const Device = mongoose.model("device", deviceSchema);
 const RequestLog = mongoose.model("requestlog", requestLogSchema);
 
 module.exports = db;
+
+module.exports.User = User;
 
 module.exports.findUserById = async (userid) => {
   return await User.findById(userid);

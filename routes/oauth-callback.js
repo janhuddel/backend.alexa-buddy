@@ -1,14 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const axios = require("axios").default;
-const qs = require("query-string");
-
-const config = {
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded",
-  },
-};
-const url = `https://api.amazon.com/auth/o2/token`;
+const { getAccessToken, getUserProfile } = require("../util/auth-service");
+const { User, findUserById } = require("../database");
 
 router.get("/", async (req, res) => {
   // State from Server
@@ -23,24 +16,37 @@ router.get("/", async (req, res) => {
   }
 
   // aquire token from token-endpoint
-  const response = await axios.post(
-    "https://api.amazon.com/auth/o2/token",
-    qs.stringify({
-      client_id: process.env.CLIENT_ID,
-      client_secret: process.env.CLIENT_SECRET,
-      code: req.query.code,
-      grant_type: "authorization_code",
-      redirect_uri: process.env.REDIRECT_URI,
-    }),
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
+  const tokenResponse = await getAccessToken(req.query.code);
+
+  // load user-profile
+  const profileResponse = await getUserProfile(tokenResponse.access_token);
+
+  // lookup user
+  let user = await findUserById(profileResponse.user_id);
+  const currentTimestamp = new Date();
+  if (!user) {
+    // create new User
+    user = new User({
+      _id: profileResponse.user_id,
+      created: currentTimestamp,
+      updated: currentTimestamp,
+      name: profileResponse.name,
+      email: profileResponse.email,
+      apikey: "",
+      accessToken: tokenResponse.access_token,
+      refreshToken: tokenResponse.refresh_token,
+    });
+  } else {
+    // update tokens
+    user.updated = currentTimestamp;
+    user.accessToken = tokenResponse.access_token;
+    user.refreshToken = tokenResponse.refresh_token;
+  }
+
+  await user.save();
 
   // save token to session
-  req.session.token = response.data.access_token;
+  req.session.token = tokenResponse.access_token;
 
   // redirect to Vue app
   res.redirect(`http://localhost:3000`);
