@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 });
 
 // setup routes
+app.use("/", require("../routes/default"));
 app.use("/user", require("../routes/user"));
 app.use("/login", require("../routes/login"));
 app.use("/logout", require("../routes/logout"));
