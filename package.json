@@ -29,11 +29,13 @@
     "express-session": "^1.17.2",
     "mongoose": "^5.13.7",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.10",
     "pino": "^6.12.0",
     "pino-express": "^1.1.1",
     "pino-pretty": "^5.1.3",
     "query-string": "^7.0.1",
     "socket.io": "^4.1.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.10"
   }
 }
