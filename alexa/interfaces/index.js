@@ -2,6 +2,7 @@ const { createHeader } = require("../common");
 const { findUserDevices, findDeviceById } = require("../../database");
 
 const capabilityMap = {
+  ColorTemperatureController: require("./colortemperaturecontroller"),
   PowerController: require("./powercontroller"),
   PowerLevelController: require("./powerlevelcontroller"),
   ShutterController: require("./shuttercontroller"),
@@ -107,6 +108,8 @@ module.exports.mapInterface = (namespace) => {
       return capabilityMap["PowerController"];
     case "Alexa.PowerLevelController":
       return capabilityMap["PowerLevelController"];
+    case "Alexa.ColorTemperatureController":
+      return capabilityMap["ColorTemperatureController"];
     case "Alexa.ModeController":
       // FIXME: ich benötige eine Zusatzinformation im Device (cookie?), um zu erkennen, auf was der ModeController gemapped werden soll
       return capabilityMap["ShutterController"];
