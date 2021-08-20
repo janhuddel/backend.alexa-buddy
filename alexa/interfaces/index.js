@@ -1,5 +1,6 @@
 const { createHeader } = require("../common");
 const { findUserDevices, findDeviceById } = require("../../database");
+const logger = require("../../util/logging");
 
 const capabilityMap = {
   ColorTemperatureController: require("./colortemperaturecontroller"),
@@ -61,6 +62,7 @@ const defaultHandler = {
         const interface = capabilityMap[key];
 
         const state = await clientSocket.getState(capability.datapoint);
+        logger.debug("got state: %s", JSON.stringify(state));
         if (state.val) {
           return interface.MapState(
             state.val,
