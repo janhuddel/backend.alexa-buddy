@@ -13,7 +13,7 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 
 db.once("open", () => {
-  logger.info("Connected to mongodb");
+  logger.info(`Connected to mongodb (${mongoUri})`);
 });
 
 const userSchema = new mongoose.Schema({

@@ -55,15 +55,8 @@ module.exports.getClientSocket = (userId) => {
   const clientSocket = io.sockets.sockets.get(clients[userId]);
 
   const sendMessage = (event, message) => {
-    logger.debug(
-      "sending event %s to server (message = %s)",
-      event,
-      JSON.stringify(message)
-    );
-
     return new Promise((resolve) => {
       clientSocket.emit(event, message, (response) => {
-        logger.debug("resonse for event: %s", JSON.stringify(response));
         resolve(response);
       });
     });
