@@ -43,7 +43,7 @@ const requestLogSchema = new mongoose.Schema({
   responseStatus: String,
 });
 
-const User = mongoose.model("user ", userSchema);
+const User = mongoose.model("user", userSchema);
 const Device = mongoose.model("device", deviceSchema);
 const RequestLog = mongoose.model("requestlog", requestLogSchema);
 
