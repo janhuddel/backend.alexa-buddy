@@ -62,8 +62,7 @@ const defaultHandler = {
         const interface = capabilityMap[key];
 
         const state = await clientSocket.getState(capability.datapoint);
-        logger.debug("got state: %s", JSON.stringify(state));
-        if (state.val) {
+        if (state.val !== undefined) {
           return interface.MapState(
             state.val,
             new Date(state.ts).toISOString(),
