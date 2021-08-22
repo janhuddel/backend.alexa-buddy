@@ -1,20 +1,40 @@
 /**
- * Docs: https://developer.amazon.com/en-US/docs/alexa/device-apis/alexa-colortemperaturecontroller.html
+ * Docs: https://developer.amazon.com/en-US/docs/alexa/device-apis/alexa-colorcontroller.html
  */
 const { createHeader, notImplemented } = require("../common");
 const { findDeviceById } = require("../../database");
 
-const NAMESPACE = "Alexa.ColorTemperatureController";
+// Color-Conversion
+const Color = require("color");
+const hueconv = require("@q42philips/hue-color-converter");
+
+const NAMESPACE = "Alexa.ColorController";
+
+const convertToXy = (color) => {
+  const rgb = Color.hsv(
+    parseFloat(color.hue),
+    parseFloat(color.saturation) * 100,
+    parseFloat(color.brightness) * 100
+  ).rgb();
+
+  const xy = hueconv.calculateXY(rgb.red(), rgb.green(), rgb.blue());
+  return `${xy[0]},${xy[1]}`;
+};
 
 const stateProperty = (value, timeOfSample, capability) => {
   if (!timeOfSample) {
     timeOfSample = new Date().toISOString();
   }
 
+  // FIXME: StateReporting derzeit mit fixem Wert, da ich xy nicht nach HSB umrechnen kann
   return {
     namespace: NAMESPACE,
-    name: "colorTemperatureInKelvin",
-    value: value,
+    name: "color",
+    value: {
+      hue: 350.5,
+      saturation: 0.7138,
+      brightness: 0.6524,
+    },
     timeOfSample: timeOfSample,
     uncertaintyInMilliseconds: 0,
   };
@@ -26,7 +46,7 @@ module.exports.Discover = () => {
     interface: NAMESPACE,
     version: process.env.PAYLOAD_VERSION,
     properties: {
-      supported: [{ name: "colorTemperatureInKelvin" }],
+      supported: [{ name: "color" }],
       proactivelyReported: false,
       retrievable: true,
     },
@@ -35,11 +55,11 @@ module.exports.Discover = () => {
 
 module.exports.MapState = stateProperty;
 
-module.exports.SetColorTemperature = async (directive, user, clientSocket) => {
+module.exports.SetColor = async (directive, user, clientSocket) => {
   const device = await findDeviceById(directive.endpoint.endpointId);
-  const capability = device.capabilities["ColorTemperatureController"];
+  const capability = device.capabilities["ColorController"];
 
-  const value = directive.payload.colorTemperatureInKelvin;
+  const value = convertToXy(directive.payload.color);
   await clientSocket.setState({
     [capability.datapoint]: value,
   });
@@ -55,13 +75,7 @@ module.exports.SetColorTemperature = async (directive, user, clientSocket) => {
       payload: {},
     },
     context: {
-      properties: [stateProperty(value)],
+      properties: [stateProperty()],
     },
   };
 };
-
-module.exports.IncreaseColorTemperature = async (directive) =>
-  notImplemented(directive, "IncreaseColorTemperature");
-
-module.exports.DecreaseColorTemperature = async (directive) =>
-  notImplemented(directive, "DecreaseColorTemperature");

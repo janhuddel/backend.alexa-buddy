@@ -21,7 +21,9 @@
     "devserver": "nodemon ./index.js"
   },
   "dependencies": {
+    "@q42philips/hue-color-converter": "^1.0.0",
     "axios": "^0.21.1",
+    "color": "^4.0.1",
     "cors": "^2.8.5",
     "date-fns": "^2.22.1",
     "dotenv": "^10.0.0",
