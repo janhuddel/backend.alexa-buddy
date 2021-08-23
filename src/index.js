@@ -18,5 +18,5 @@ const port = process.env.SERVER_PORT || 3000;
 
 // listen to server
 server.listen(port, () => {
-  logger.info(`Listening on port ${port}`);
+  logger.info(`Waiting for requests on port ${port}`);
 });
