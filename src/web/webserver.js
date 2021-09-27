@@ -1,8 +1,7 @@
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-//const morgan = require("morgan");
-const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
 // create app
 const app = express();
@@ -10,38 +9,17 @@ const server = http.createServer(app);
 
 // apply middleware
 app.use(cors({ origin: true, credentials: true }));
-//app.use(morgan("common"));
+app.use(cookieParser());
 app.use(express.json());
 
-// session-middleware
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET, // don't use this secret in prod :)
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: "auto",
-    httpOnly: true,
-    maxAge: 3600000,
-  },
-});
+// oauth
+app.use("/oauth", require("../routes/oauth"));
 
-app.use((req, res, next) => {
-  // do not create session on /api/* - routes
-  if (req.path.startsWith("/api/")) {
-    next();
-  } else {
-    sessionMiddleware(req, res, next);
-  }
-});
-
-// setup routes
-app.use("/", require("../routes/default"));
-app.use("/user", require("../routes/user"));
-app.use("/login", require("../routes/login"));
-app.use("/logout", require("../routes/logout"));
-app.use("/oauth-callback", require("../routes/oauth-callback"));
-app.use("/set-user-data", require("../routes/set-user-data"));
+// api for webapp
 app.use("/api", require("../routes/api"));
+
+// alexa-request-handler
+app.use("/alexa", require("../routes/alexa"));
 
 module.exports = server;
 

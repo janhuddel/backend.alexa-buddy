@@ -1,19 +1,29 @@
 const express = require("express");
-const router = express.Router();
+const jwt = require("njwt");
+
 const { getAccessToken, getUserProfile } = require("../util/auth-service");
 const { User, findUserById } = require("../database");
 
-router.get("/", async (req, res) => {
-  // State from Server
-  const stateFromServer = req.query.state;
-  if (stateFromServer !== req.session.stateValue) {
-    console.log("State doesn't match. uh-oh.");
-    console.log(
-      `Saw: ${stateFromServer}, but expected: ${req.session.stateValue}`
-    );
-    res.redirect(302, "/");
-    return;
-  }
+const router = express.Router();
+
+/**
+ * Redirect to Amazon-Login-Page.
+ */
+router.get("/login", async (req, res) => {
+  res.redirect(
+    `https://www.amazon.com/ap/oa?client_id=${
+      process.env.CLIENT_ID
+    }&scope=profile&response_type=code&state=${
+      req.query.intent
+    }&redirect_uri=${encodeURIComponent(process.env.REDIRECT_URI)}`
+  );
+});
+
+/**
+ * Process OAuth-Callback
+ */
+router.get("/callback", async (req, res) => {
+  const intent = req.query.state;
 
   // aquire token from token-endpoint
   const tokenResponse = await getAccessToken(req.query.code);
@@ -23,6 +33,7 @@ router.get("/", async (req, res) => {
 
   // lookup user
   let user = await findUserById(profileResponse.user_id);
+
   const currentTimestamp = new Date();
   if (!user) {
     // create new User
@@ -45,10 +56,17 @@ router.get("/", async (req, res) => {
 
   await user.save();
 
-  // save token to session
-  req.session.token = tokenResponse.access_token;
+  const claims = { iss: "fun-with-jwts", sub: user._id };
+  const token = jwt.create(claims, process.env.JWT_SIGNING_KEY);
+  token.setExpiration(new Date().getTime() + 24 * 60 * 60 * 1000); // 1 day
 
-  // redirect to Vue app
-  res.redirect(`http://localhost:3000`);
+  // store jwt-token in httpOnly-Cookie
+  res
+    .cookie("jwt", token.compact(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    })
+    .redirect(`http://localhost:3000${intent}`);
 });
+
 module.exports = router;

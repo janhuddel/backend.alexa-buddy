@@ -21,13 +21,12 @@ jobs:
         run: docker build . --file Dockerfile --tag registry.rohwer.sh/alexa-buddy:latest
       - name: push docker image
         run: docker push registry.rohwer.sh/alexa-buddy:latest
-
-  redeploy:
-    name: Redeploy webhook call
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Webhook
-        uses: joelwmale/webhook-action@fd99bb3b8272237103e349e9bb4d9b0ead9a217c
-        with:
-          url: https://webhook.rohwer.sh/hooks/alexa-buddy
+#  redeploy:
+#    name: Redeploy webhook call
+#    runs-on: ubuntu-latest
+#    needs: [build]
+#    steps:
+#      - name: Webhook
+#        uses: joelwmale/webhook-action@fd99bb3b8272237103e349e9bb4d9b0ead9a217c
+#        with:
+#          url: https://webhook.rohwer.sh/hooks/alexa-buddy
