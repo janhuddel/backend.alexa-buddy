@@ -35,6 +35,10 @@ const authorizeAlexaRequest = async (req, res, next) => {
       const response = await axios.get(uri);
 
       if (response.status === 200) {
+        logger.info(
+          `User authenticated (userid: ${response.data.user_id}, token: ${token})`
+        );
+
         // lookup user
         const localUser = await findUserById(response.data.user_id);
         if (localUser) {
